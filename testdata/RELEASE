@@ -1,0 +1,7 @@
+name: testdata
+releaseNoteGenerator:
+    commitInclude:
+        prefixes:
+          - 'Merge pull request #'
+    usePullRequestMetadata: true
+tag: hoge/fuga/v1.1.1

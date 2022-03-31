@@ -1,7 +1,11 @@
-name: testdata
+name: hoge/microservice # hoge fuga
+tag: hoge/fuga/v1.1.100
+commitInclude: # test
+    contains:
+      - hoge/microservice
+    parentOfMergeCommit: true
 releaseNoteGenerator:
     commitInclude:
-        prefixes:
-          - 'Merge pull request #'
+        contains:
+          - hoge/microservice
     usePullRequestMetadata: true
-tag: hoge/fuga/v1.1.1

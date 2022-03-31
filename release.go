@@ -7,7 +7,9 @@ import (
 	"strconv"
 	"strings"
 
-	"gopkg.in/yaml.v3"
+	"github.com/goccy/go-yaml"
+	"github.com/goccy/go-yaml/ast"
+	"github.com/goccy/go-yaml/parser"
 )
 
 const (
@@ -15,7 +17,6 @@ const (
 )
 
 // ReleaseFile の tag を書き換える
-// TODO: comment out 残せるように対応したい
 func writeReleaseFile(filePath, tag string) {
 	if filePath == "" {
 		filePath = defaultPath
@@ -25,30 +26,49 @@ func writeReleaseFile(filePath, tag string) {
 		log.Fatalf("failed to read file: %v", err)
 	}
 
-	var releaseFile interface{}
-	if err = yaml.Unmarshal(f, &releaseFile); err != nil {
-		log.Fatalf("failed to unmarshal release file: %v", err)
+	parseFile, err := parser.ParseBytes(f, parser.ParseComments)
+	if err != nil {
+		log.Fatalf("failed to read file: %v", err)
 	}
-	oldTag := releaseFile.(map[string]interface{})["tag"]
+
+	yamlPath, err := yaml.PathString("$.tag")
+	if err != nil {
+		log.Fatalf("failed to file path: %v", err)
+	}
+
+	oldNode, err := yamlPath.FilterFile(parseFile)
+	if err != nil {
+		log.Fatalf("failed to read old node")
+	}
+	newNode := &ast.StringNode{
+		BaseNode: &ast.BaseNode{},
+		Token:    oldNode.GetToken(),
+	}
+	oldTag := oldNode.String()
 
 	var newTag, prefix string
-
 	if tag == "" {
-		newTag, prefix = increment(oldTag.(string))
-		releaseFile.(map[string]interface{})["tag"] = prefix + newTag
+		newTag, prefix = increment(oldTag)
+		newNode.Value = prefix + newTag
 	} else {
-		if oldTag.(string) == "" {
+		if oldTag == "" {
 			log.Fatalf("tag is not exists")
 		}
 		newTag = replacement(tag)
-		releaseFile.(map[string]interface{})["tag"] = newTag
+		newNode.Value = newTag
 	}
 
-	buf, err := yaml.Marshal(&releaseFile)
-	if err != nil {
-		log.Fatalf("failed to marshal release file: %v", err)
+	if c := oldNode.GetComment(); c != nil {
+		if err := newNode.SetComment(c); err != nil {
+			log.Fatalf("failed to set comment: %v", err)
+		}
 	}
-	if err := os.WriteFile(filePath, buf, os.ModeExclusive); err != nil {
+
+	if err := yamlPath.ReplaceWithNode(parseFile, newNode); err != nil {
+		log.Fatalf("failed to replace file: %v", err)
+	}
+
+	if err := os.WriteFile(filePath, []byte(parseFile.String()), os.ModeExclusive); err != nil {
 		log.Fatalf("failed to write file: %v", err)
 	}
 }

@@ -45,3 +45,33 @@ func Test_increment(t *testing.T) {
 		})
 	}
 }
+
+func Test_writeReleaseFile(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		filePath string
+		tag      string
+		wantTag  string
+	}{
+		{
+			name: "increment release file",
+		},
+		{
+			name: "replacement release file",
+			tag:  "v1.1.1",
+		},
+		{
+			name:     "replacement release file, has prefix",
+			filePath: "./testdata/RELEASE",
+			tag:      "hoge/fuga/v1.1.1",
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			writeReleaseFile(tt.filePath, tt.tag)
+		})
+	}
+}

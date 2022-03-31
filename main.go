@@ -22,8 +22,6 @@ type env struct {
 	GithubOrganization string `envconfig:"GITHUB_ORGANIZATION"`
 	RepositoryName     string `envconfig:"REPOSITORY_NAME"`
 	ReleaseFilePath    string `envconfig:"RELEASE_FILE_PATH"`
-	OldTag             string `envconfig:"OLD_TAG"`
-	NewTag             string `envconfig:"NEW_TAG"`
 }
 
 const (
@@ -36,16 +34,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), jobTimeout)
-	defer cancel()
-	client := newGHClient(e.GithubToken)
+	// ctx, cancel := context.WithTimeout(context.Background(), jobTimeout)
+	// defer cancel()
+	// client := newGHClient(e.GithubToken)
 
-	if e.NewTag == "" {
-		client.client.Organizations.GetPackage(ctx, e.GithubOrganization, "maven", e.RepositoryName)
-		increment("タグを入れる")
-		return
-	}
-	replacement(e.NewTag)
 }
 
 type ghClient struct {

@@ -60,12 +60,12 @@ func Test_writeReleaseFile(t *testing.T) {
 		},
 		{
 			name: "replacement release file",
-			tag:  "v1.1.1",
+			tag:  "v1.1.2",
 		},
 		{
 			name:     "replacement release file, has prefix",
 			filePath: "./testdata/RELEASE",
-			tag:      "hoge/fuga/v1.1.1",
+			tag:      "hoge/fuga/v1.1.100",
 		},
 	}
 	for _, tt := range tests {

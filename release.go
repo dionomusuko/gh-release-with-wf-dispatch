@@ -1,31 +1,30 @@
 package main
 
 import (
+	"io"
 	"log"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/go-git/go-billy/v5"
 	"github.com/goccy/go-yaml"
 	"github.com/goccy/go-yaml/ast"
 	"github.com/goccy/go-yaml/parser"
 )
 
 const (
-	defaultPath = "./RELEASE"
+	defaultPath = "RELEASE"
 )
 
-// ReleaseFile の tag を書き換える
-func writeReleaseFile(filePath, tag string) {
+func readReleaseFile(fs billy.Filesystem, filePath string) (string, *ast.StringNode, *yaml.Path, *ast.File) {
 	if filePath == "" {
 		filePath = defaultPath
 	}
-	f, err := os.ReadFile(filePath)
-	if err != nil {
-		log.Fatalf("failed to read file: %v", err)
-	}
+	file, _ := fs.Open(filePath)
 
+	f, _ := io.ReadAll(file)
 	parseFile, err := parser.ParseBytes(f, parser.ParseComments)
 	if err != nil {
 		log.Fatalf("failed to read file: %v", err)
@@ -44,19 +43,6 @@ func writeReleaseFile(filePath, tag string) {
 		BaseNode: &ast.BaseNode{},
 		Token:    oldNode.GetToken(),
 	}
-	oldTag := oldNode.String()
-
-	var newTag, prefix string
-	if tag == "" {
-		newTag, prefix = increment(oldTag)
-		newNode.Value = prefix + newTag
-	} else {
-		if oldTag == "" {
-			log.Fatalf("tag is not exists")
-		}
-		newTag = replacement(tag)
-		newNode.Value = newTag
-	}
 
 	if c := oldNode.GetComment(); c != nil {
 		if err := newNode.SetComment(c); err != nil {
@@ -64,13 +50,30 @@ func writeReleaseFile(filePath, tag string) {
 		}
 	}
 
+	return oldNode.String(), newNode, yamlPath, parseFile
+}
+
+func writeFile(yamlPath *yaml.Path, fs billy.Filesystem, parseFile *ast.File, newNode *ast.StringNode, filePath string) {
 	if err := yamlPath.ReplaceWithNode(parseFile, newNode); err != nil {
 		log.Fatalf("failed to replace file: %v", err)
 	}
+	ff, _ := fs.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0666)
+	ff.Write([]byte(parseFile.String()))
+}
 
-	if err := os.WriteFile(filePath, []byte(parseFile.String()), os.ModeExclusive); err != nil {
-		log.Fatalf("failed to write file: %v", err)
+func generateTag(newNode *ast.StringNode, oldTag, tag string) (*ast.StringNode, string) {
+	if oldTag == "" {
+		log.Fatalf("failed to get oldTag")
 	}
+
+	if tag == "" {
+		newTag, prefix := increment(oldTag)
+		newNode.Value = prefix + newTag
+		return newNode, newTag
+	}
+	newTag := replacement(tag)
+	newNode.Value = newTag
+	return newNode, newTag
 }
 
 // version の increment実装

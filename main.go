@@ -3,11 +3,7 @@ package main
 import (
 	"context"
 	"log"
-	"time"
 
-	"golang.org/x/oauth2"
-
-	"github.com/google/go-github/v43/github"
 	"github.com/kelseyhightower/envconfig"
 )
 
@@ -16,42 +12,31 @@ import (
 // リリースバージョンあり-> その値に置き換え
 // なし -> パッチリリースするよう値をインクリメント
 // RELEASE fileは yamlとして考える
-
 type env struct {
-	GithubToken        string `envconfig:"GITHUB_TOKEN"`
-	GithubOrganization string `envconfig:"GITHUB_ORGANIZATION"`
-	RepositoryName     string `envconfig:"REPOSITORY_NAME"`
-	ReleaseFilePath    string `envconfig:"RELEASE_FILE_PATH"`
+	GithubToken     string `envconfig:"GITHUB_TOKEN"`
+	ReleaseFilePath string `envconfig:"RELEASE_FILE_PATH"`
+	NewTag          string `envconfig:"NEW_TAG"`
+	Owner           string `envconfig:"OWNER"`
+	Repo            string `envconfig:"REPO"`
+	BaseBranch      string `envconfig:"BASE_BRANCH"`
 }
 
-const (
-	jobTimeout = 10 * 60 * time.Second
-)
-
 func main() {
+	ctx := context.Background()
 	var e env
 	err := envconfig.Process("INPUT", &e)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	// ctx, cancel := context.WithTimeout(context.Background(), jobTimeout)
-	// defer cancel()
-	// client := newGHClient(e.GithubToken)
 
-}
-
-type ghClient struct {
-	client *github.Client
-}
-
-func newGHClient(token string) *ghClient {
-	ctx := context.Background()
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-	client := github.NewClient(tc)
-	return &ghClient{
-		client: client,
-	}
+	gitCli := newGitClient(ctx, e.GithubToken, e.Owner, e.Repo)
+	oldTag, newNode, yamlPath, parseFile := readReleaseFile(gitCli.file, e.ReleaseFilePath)
+	newNode, newTag := generateTag(newNode, oldTag, e.NewTag)
+	log.Printf("tag: %v", newTag)
+	writeFile(yamlPath, gitCli.file, parseFile, newNode, e.ReleaseFilePath)
+	branch := gitCli.Checkout(newTag)
+	gitCli.Commit(ctx, e.ReleaseFilePath, newTag)
+	gitCli.Push(ctx)
+	ghCli := newGHClient(e.GithubToken)
+	ghCli.newPullRequest(ctx, newTag, e.BaseBranch, e.Repo, e.Owner, branch)
 }

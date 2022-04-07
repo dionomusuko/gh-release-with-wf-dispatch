@@ -1,0 +1,22 @@
+on:
+  workflow_dispatch:
+    inputs:
+      path:
+        description: 'Input RELEASE file path'
+        required: true
+        default: './RELEASE'
+        options:
+          - './RELEASE'
+          - './testdata/RELEASE'
+      tags:
+        description: 'Input new tag'
+        required: false
+        options:
+          - hoge/fuga/v1.0.0
+          - v1.0.0
+jobs
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2

@@ -69,8 +69,8 @@ func generateTag(newNode *ast.StringNode, oldTag, tag string) (*ast.StringNode, 
 	}
 
 	if tag == "" {
-		newTag, prefix := increment(oldTag)
-		newNode.Value = prefix + newTag
+		newTag, _ := increment(oldTag)
+		newNode.Value = newTag
 		return newNode, newTag
 	}
 	newTag := replacement(tag)

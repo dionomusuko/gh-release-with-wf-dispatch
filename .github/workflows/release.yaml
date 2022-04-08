@@ -5,7 +5,6 @@ on:
         description: 'Define the path of RELEASE file'
         required: true
         default: 'RELEASE'
-        type: choice
         options:
           - 'RELEASE'
           - 'testdata/RELEASE'

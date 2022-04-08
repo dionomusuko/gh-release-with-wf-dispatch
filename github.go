@@ -28,7 +28,7 @@ func (g *ghClient) newPullRequest(ctx context.Context, newTag, baseBranch, repo,
 		Title: github.String("chore: release-" + newTag),
 		Head:  github.String(owner + ":" + branchName),
 		Base:  github.String(baseBranch),
-		Body:  github.String("Release"),
+		Body:  github.String("Release " + newTag),
 	}
 	g.client.PullRequests.Create(ctx, owner, repo, pr)
 }

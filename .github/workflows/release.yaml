@@ -7,8 +7,8 @@ on:
         default: 'RELEASE'
         type: choice
         options:
-          - RELEASE
-          - testdata/RELEASE
+          - 'RELEASE'
+          - 'testdata/RELEASE'
       newTag:
         description: 'new tag'
         required: false
@@ -27,7 +27,7 @@ jobs:
         with:
           "github_token": ${{ secrets.GITHUB_TOKEN }}
           "owner": ${{ github.event.repository.owner.login }}
-          "repo": ${{ github.event.repository.name }}
+          "repo": ${{ secrets.GITHUB_ACTION_REPOSITORY }}
           "releae_file_path": ${{ github.event.inputs.releaeFilePath }}
           "base_branch": ${{ github.event.inputs.baseBranch }}
           "new_tag": ${{ github.event.inputs.newTag }}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
@@ -30,5 +31,7 @@ func (g *ghClient) newPullRequest(ctx context.Context, newTag, baseBranch, repo,
 		Base:  github.String(baseBranch),
 		Body:  github.String("Release " + newTag),
 	}
-	g.client.PullRequests.Create(ctx, owner, repo, pr)
+	if _, _, err := g.client.PullRequests.Create(ctx, owner, repo, pr); err != nil {
+		log.Fatalf("faield to create pull request: %v", err)
+	}
 }

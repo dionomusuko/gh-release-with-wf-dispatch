@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - uses: dionomusuko/gh-release-with-wf-dispatch@v0.0.3
+      - uses: dionomusuko/gh-release-with-wf-dispatch@master
         with:
           "github_token": ${{ secrets.GITHUB_TOKEN }}
           "owner": ${{ github.event.repository.owner.login }}

@@ -1,7 +1,6 @@
 on:
   workflow_dispatch:
     inputs:
-      path:
       releaseFilePath:
         description: 'Define the path of RELEASE file'
         required: true
@@ -31,4 +30,4 @@ jobs:
           "repo": ${{ github.event.repository.name }}
           "releae_file_path": ${{ github.event.inputs.releaeFilePath }}
           "base_branch": ${{ github.event.inputs.baseBranch }}
-          "new_tag": ${{ github.event.inputs.newTag }
+          "new_tag": ${{ github.event.inputs.newTag }}

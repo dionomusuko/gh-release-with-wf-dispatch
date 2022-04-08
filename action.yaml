@@ -20,6 +20,9 @@ inputs:
   repo:
     description: 'repository'
     required: true
+  repo_full_name:
+    description: 'repository full name'
+    required: true
   base_branch:
     description: 'base branch'
     required: true

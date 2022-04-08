@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v2
       - uses: dionomusuko/gh-release-with-wf-dispatch@master
         with:
-          "github_token": ${{ secrets.GITHUB_TOKEN }}
+          "github_token": ${{ secrets.GH_PAT }}
           "owner": ${{ github.event.repository.owner.login }}
           "repo": ${{ github.event.repository.full_name }}
           "release_file_path": ${{ github.event.inputs.releaeFilePath }}

@@ -11,6 +11,7 @@ type env struct {
 	GithubToken     string `envconfig:"GITHUB_TOKEN"`
 	ReleaseFilePath string `envconfig:"RELEASE_FILE_PATH"`
 	Owner           string `envconfig:"OWNER"`
+	RepoFullName    string `envconfig:"REPO_FULL_NAME"`
 	Repo            string `envconfig:"REPO"`
 	BaseBranch      string `envconfig:"BASE_BRANCH"`
 	NewTag          string `envconfig:"NEW_TAG"`
@@ -23,7 +24,7 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	gitCli := newGitClient(ctx, e.GithubToken, e.Repo)
+	gitCli := newGitClient(ctx, e.GithubToken, e.RepoFullName)
 	oldTag, newNode, yamlPath, parseFile := readReleaseFile(gitCli.file, e.ReleaseFilePath)
 	newNode, newTag := generateTag(newNode, oldTag, e.NewTag)
 	log.Printf("tag: %v", newTag)

@@ -1,5 +1,5 @@
 name: hoge/microservice # hoge fuga
-tag: hoge/fuga/v1.1.100
+tag: hoge/fuga/hoge/fuga/v1.1.101
 commitInclude: # test
     contains:
       - hoge/microservice

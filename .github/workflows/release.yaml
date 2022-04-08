@@ -5,6 +5,7 @@ on:
         description: 'Define the path of RELEASE file'
         required: true
         default: 'RELEASE'
+        type: choice
         options:
           - 'RELEASE'
           - 'testdata/RELEASE'
@@ -23,6 +24,6 @@ jobs:
           "github_token": ${{ secrets.GH_PAT }}
           "owner": ${{ github.event.repository.owner.login }}
           "repo": ${{ github.event.repository.full_name }}
-          "release_file_path": ${{ github.event.inputs.releaeFilePath }}
+          "release_file_path": ${{ github.event.inputs.releaseFilePath }}
           "base_branch": ${{ github.event.repository.default_branch }}
           "new_tag": ${{ github.event.inputs.newTag }}

@@ -58,7 +58,9 @@ func writeFile(yamlPath *yaml.Path, fs billy.Filesystem, parseFile *ast.File, ne
 		log.Fatalf("failed to replace file: %v", err)
 	}
 	ff, _ := fs.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0666)
-	ff.Write([]byte(parseFile.String()))
+	if _, err := ff.Write([]byte(parseFile.String())); err != nil {
+		log.Fatalf("failed to write file: %v", err)
+	}
 }
 
 func generateTag(newNode *ast.StringNode, oldTag, tag string) (*ast.StringNode, string) {

@@ -2,21 +2,33 @@ on:
   workflow_dispatch:
     inputs:
       path:
-        description: 'Input RELEASE file path'
+      releaseFilePath:
+        description: 'Define the path of RELEASE file'
         required: true
-        default: './RELEASE'
+        default: 'RELEASE'
+        type: choice
         options:
-          - './RELEASE'
-          - './testdata/RELEASE'
-      tags:
-        description: 'Input new tag'
+          - RELEASE
+          - testdata/RELEASE
+      newTag:
+        description: 'new tag'
         required: false
-        options:
-          - hoge/fuga/v1.0.0
-          - v1.0.0
-jobs
+      baseBranch:
+        description: 'base branch e.g. master'
+        required: true
+        default: 'master'
+
+jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - uses: dionomusuko/gh-release-with-wf-dispatch@v0.0.3
+        with:
+          "github_token": ${{ secrets.GITHUB_TOKEN }}
+          "owner": ${{ github.event.repository.owner.login }}
+          "repo": ${{ github.event.repository.name }}
+          "releae_file_path": ${{ github.event.inputs.releaeFilePath }}
+          "base_branch": ${{ github.event.inputs.baseBranch }}
+          "new_tag": ${{ github.event.inputs.newTag }

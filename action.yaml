@@ -1,0 +1,27 @@
+name: 'gh-release-with-wf-dispatch'
+description: 'release'
+author: 'dionomusuko'
+branding:
+  icon: 'fast-forward'
+  color: 'red'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+inputs:
+  github_token:
+    description: 'github token'
+    required: true
+  release_file_path:
+    description: 'release file path'
+    required: true
+  owner:
+    description: 'owner'
+    required: true
+  repo:
+    description: 'repository'
+    required: true
+  base_branch:
+    description: 'base branch'
+    required: true
+    default: 'master'
+

@@ -24,4 +24,6 @@ inputs:
     description: 'base branch'
     required: true
     default: 'master'
-
+  new_tag:
+    description: 'new release tag, if you are doing patch-version-release, there is no need to configure'
+    required: false

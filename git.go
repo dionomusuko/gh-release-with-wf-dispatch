@@ -20,16 +20,15 @@ type gitClient struct {
 	repository *git.Repository
 	worktree   *git.Worktree
 	file       billy.Filesystem
-	userName   string
 	token      string
 }
 
-func newGitClient(ctx context.Context, token, userName, repository string) *gitClient {
+func newGitClient(ctx context.Context, token, repository string) *gitClient {
 	fs := memfs.New()
 
-	// https://<GITHUB_ACCESS_TOKEN>@github.com/<OWNEr>/<REPO>.git
+	// https://<GITHUB_TOKEN>@github.com/<REPO>.git
 	repo, err := git.CloneContext(ctx, memory.NewStorage(), fs, &git.CloneOptions{
-		URL: fmt.Sprintf("https://%s@github.com/%s/%s.git", token, userName, repository),
+		URL: fmt.Sprintf("https://%s@github.com/%s.git", token, repository),
 	})
 	if err != nil {
 		log.Fatalf("falied to clone repository")
@@ -42,7 +41,6 @@ func newGitClient(ctx context.Context, token, userName, repository string) *gitC
 		repository: repo,
 		worktree:   w,
 		file:       fs,
-		userName:   userName,
 		token:      token,
 	}
 }
@@ -54,12 +52,12 @@ func (g *gitClient) Checkout(newTag string) string {
 		Create: true,
 		Branch: branch,
 	}); err != nil {
-		log.Fatalf("falied to chckout repository")
+		log.Fatalf("falied to chckout repository: %v", err)
 	}
 	return branch.String()
 }
 
-func (g *gitClient) Commit(ctx context.Context, filePath, newTag string) {
+func (g *gitClient) Commit(filePath, newTag string) {
 	// Create Commit
 	if _, err := g.worktree.Add(filePath); err != nil {
 		log.Fatalf("falied to add")
@@ -75,11 +73,11 @@ func (g *gitClient) Commit(ctx context.Context, filePath, newTag string) {
 	}
 }
 
-func (g *gitClient) Push(ctx context.Context) {
+func (g *gitClient) Push(ctx context.Context, owner string) {
 	if err := g.repository.PushContext(ctx, &git.PushOptions{
 		Progress: os.Stdout,
 		Auth: &http.BasicAuth{
-			Username: g.userName,
+			Username: owner,
 			Password: g.token,
 		},
 		RemoteName: "origin",

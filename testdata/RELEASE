@@ -9,3 +9,4 @@ releaseNoteGenerator:
         contains:
           - hoge/microservice
     usePullRequestMetadata: true
+# test data

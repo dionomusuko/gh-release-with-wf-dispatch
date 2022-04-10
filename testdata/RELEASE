@@ -1,7 +1,7 @@
 name: hoge/microservice
-tag: hoge/fuga/v1.1.100
+tag: v0.0.5
 releaseNoteGenerator:
   usePullRequestMetadata: true
   commitInclude:
     prefixes:
-      - "Merge pull request #"
+      - "Merge pull request #"l request #"

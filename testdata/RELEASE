@@ -1,5 +1,5 @@
 name: hoge/microservice # hoge fuga
-tag: hoge/fuga/v1.1.100
+tag: hoge/fuga/v1.1.10
 commitInclude: # test
     contains:
       - hoge/microservice
@@ -8,4 +8,4 @@ releaseNoteGenerator:
     commitInclude:
         contains:
           - hoge/microservice
-    usePullRequestMetadata: true # test data
+    usePullRequestMetadata: true # test dataa

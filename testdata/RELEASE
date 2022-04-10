@@ -4,4 +4,4 @@ releaseNoteGenerator:
   usePullRequestMetadata: true
   commitInclude:
     prefixes:
-      - "Merge pull request #"
+      - "Merge pull request #" # hoge

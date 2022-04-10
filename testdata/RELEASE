@@ -1,8 +1,7 @@
-name: hoge/microservice            # test
-tag: hoge/fuga/v1.1.100             # test version
-
+name: hoge/microservice # test
+tag: hoge/fuga/v1.1.10 # test version
 releaseNoteGenerator:
   usePullRequestMetadata: true
   commitInclude:
     prefixes:
-      - "Merge pull request #" # test
+      - "Merge pull request #" # testge pull request #" # test

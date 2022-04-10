@@ -58,7 +58,8 @@ func writeFile(yamlPath *yaml.Path, fs billy.Filesystem, parseFile *ast.File, ne
 		log.Fatalf("failed to replace file: %v", err)
 	}
 	ff, _ := fs.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0666)
-	if _, err := ff.Write([]byte(parseFile.String())); err != nil {
+	b, _ := io.ReadAll(parseFile)
+	if _, err := ff.Write(b); err != nil {
 		log.Fatalf("failed to write file: %v", err)
 	}
 }

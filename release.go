@@ -57,9 +57,9 @@ func writeFile(yamlPath *yaml.Path, fs billy.Filesystem, parseFile *ast.File, ne
 	if err := yamlPath.ReplaceWithNode(parseFile, newNode); err != nil {
 		log.Fatalf("failed to replace file: %v", err)
 	}
-	ff, _ := fs.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0666)
 	b, _ := io.ReadAll(parseFile)
-	if _, err := ff.Write(b); err != nil {
+	f, _ := fs.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	if _, err := f.Write(b); err != nil {
 		log.Fatalf("failed to write file: %v", err)
 	}
 }

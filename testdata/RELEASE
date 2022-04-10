@@ -8,5 +8,4 @@ releaseNoteGenerator:
     commitInclude:
         contains:
           - hoge/microservice
-    usePullRequestMetadata: true
-# test data
+    usePullRequestMetadata: true # test data

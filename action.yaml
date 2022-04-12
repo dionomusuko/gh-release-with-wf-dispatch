@@ -3,7 +3,7 @@ description: 'release'
 author: 'dionomusuko'
 branding:
   icon: 'fast-forward'
-  color: 'red'
+  color: 'green'
 runs:
   using: 'docker'
   image: 'Dockerfile'

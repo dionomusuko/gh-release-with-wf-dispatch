@@ -1,5 +1,5 @@
 name: hoge/microservice
-tag: hoge/fuga/v1.1.100
+tag: v0.0.8
 releaseNoteGenerator:
   usePullRequestMetadata: true
   commitInclude:

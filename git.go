@@ -64,8 +64,8 @@ func (g *gitClient) Commit(filePath, newTag string) {
 	}
 	_, err := g.worktree.Commit("chore: release-"+newTag, &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  "github-actions",
-			Email: "github-actions@github.com",
+			Name:  "github-actions[bot]",
+			Email: "41898282+github-actions[bot]@users.noreply.github.com",
 			When:  time.Now(),
 		}})
 	if err != nil {

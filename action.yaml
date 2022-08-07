@@ -11,6 +11,7 @@ inputs:
   github_token:
     description: 'github token'
     required: true
+    default: ${{ github.token }}
   release_file_path:
     description: 'release file path'
     required: true

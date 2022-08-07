@@ -6,10 +6,10 @@ Using this function with workflow dispatch, the RELEASE file can be rewritten.
 
 
 ## Usage
-1. Setting workflow dispatch 
+1. Setting workflow dispatch
 e.g.
 ```yaml
-on: 
+on:
   workflow_dispatch:
     inputs:
       releaseFilePath:
@@ -34,8 +34,8 @@ on:
 - name: release
   uses: dionomusko/gh-release-with-wf-dispatch@master
   with:
-    "github_token": ${{ secrets.GITHUB_TOKEN }} # Set your GitHub personal access token (see: https://docs.github.com/ja/enterprise-cloud@latest/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
-    "owner": ${{ github.event.repository.owner.login }} 
+    "github_token": ${{ secrets.GH_PAT }} # Set your GitHub personal access token (see: https://docs.github.com/ja/enterprise-cloud@latest/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+    "owner": ${{ github.event.repository.owner.login }}
     "repo": ${{ github.event.repository.name }}
     "releae_file_path": ${{ github.event.inputs.releaeFilePath }}
     "base_branch": ${{ github.event.inputs.baseBranch }}

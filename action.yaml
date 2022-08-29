@@ -10,7 +10,8 @@ runs:
 inputs:
   github_token:
     description: 'github token'
-    required: true
+    required: false
+    default: ${{ github.token }}
   release_file_path:
     description: 'release file path'
     required: true

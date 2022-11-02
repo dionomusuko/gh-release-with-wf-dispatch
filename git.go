@@ -21,9 +21,15 @@ type gitClient struct {
 	worktree   *git.Worktree
 	file       billy.Filesystem
 	token      string
+	config     gitConfig
 }
 
-func newGitClient(ctx context.Context, token, repository string) *gitClient {
+type gitConfig struct {
+	userName  string
+	userEmail string
+}
+
+func newGitClient(ctx context.Context, token, repository string, config gitConfig) *gitClient {
 	fs := memfs.New()
 
 	// https://<GITHUB_TOKEN>@github.com/<REPO>.git
@@ -42,6 +48,7 @@ func newGitClient(ctx context.Context, token, repository string) *gitClient {
 		worktree:   w,
 		file:       fs,
 		token:      token,
+		config:     config,
 	}
 }
 
@@ -64,8 +71,8 @@ func (g *gitClient) Commit(filePath, newTag string) {
 	}
 	_, err := g.worktree.Commit("chore: release-"+newTag, &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  "github-actions[bot]",
-			Email: "41898282+github-actions[bot]@users.noreply.github.com",
+			Name:  g.config.userName,
+			Email: g.config.userEmail,
 			When:  time.Now(),
 		}})
 	if err != nil {

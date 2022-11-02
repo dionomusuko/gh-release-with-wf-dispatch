@@ -40,4 +40,6 @@ on:
     "releae_file_path": ${{ github.event.inputs.releaeFilePath }}
     "base_branch": ${{ github.event.inputs.baseBranch }}
     "new_tag": ${{ github.event.inputs.newTag }}
+    "user_name": "username"
+    "user_email": "useremail@example.com"
 ```

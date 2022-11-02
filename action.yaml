@@ -31,3 +31,11 @@ inputs:
   new_tag:
     description: 'new release tag, if you are doing patch-version-release, there is no need to configure'
     required: false
+  user_name:
+    description: 'git config user.name'
+    required: false
+    default: 'github-actions[bot]'
+  user_email:
+    description: 'git config user.email'
+    required: false
+    default: '41898282+github-actions[bot]@users.noreply.github.com'

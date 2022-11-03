@@ -1,6 +1,6 @@
 module github.com/dionomusuko/gh-release-with-wf-dispatch
 
-go 1.17
+go 1.19
 
 require (
 	github.com/go-git/go-billy/v5 v5.3.1

@@ -37,7 +37,7 @@ on:
     "github_token": ${{ secrets.GH_PAT }} # Set your GitHub personal access token (see: https://docs.github.com/ja/enterprise-cloud@latest/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
     "owner": ${{ github.event.repository.owner.login }}
     "repo": ${{ github.event.repository.name }}
-    "releae_file_path": ${{ github.event.inputs.releaeFilePath }}
+    "release_file_path": ${{ github.event.inputs.releaseFilePath }}
     "base_branch": ${{ github.event.inputs.baseBranch }}
     "new_tag": ${{ github.event.inputs.newTag }}
 ```

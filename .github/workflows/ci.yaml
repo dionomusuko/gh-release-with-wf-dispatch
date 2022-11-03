@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/ci.yaml"
+      - "go.*"
+      - "*.go"
+  pull_request:
+    branches:
+      - master
+    paths:
+      - ".github/workflows/ci.yaml"
+      - "go.*"
+      - "*.go"
+
+jobs:
+  go:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # https://github.com/actions/checkout/releases/tag/v3.1.0
+      - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f # https://github.com/actions/setup-go/releases/tag/v3.3.1
+        with:
+          go-version-file: "go.mod"
+          cache: true
+      - run: go mod download
+      - run: go mod tidy
+      - run: git diff --exit-code # This fails if you forget to apply tidy
+      - run: test -z $(gofmt -l .) # This fails if you forget to apply gofmt
+      - run: CGO_ENABLED=0 GOOS=linux go build
+      - run: go test -v ./...
+
+  docker:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # https://github.com/actions/checkout/releases/tag/v3.1.0
+      - name: Build
+        run: docker build .

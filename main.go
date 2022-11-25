@@ -8,15 +8,15 @@ import (
 )
 
 type env struct {
-	GithubToken     string `envconfig:"GITHUB_TOKEN"`
-	ReleaseFilePath string `envconfig:"RELEASE_FILE_PATH"`
-	Owner           string `envconfig:"OWNER"`
-	RepoFullName    string `envconfig:"REPO_FULL_NAME"`
-	Repo            string `envconfig:"REPO"`
-	BaseBranch      string `envconfig:"BASE_BRANCH"`
-	NewTag          string `envconfig:"NEW_TAG"`
-	UserName        string `envconfig:"USER_NAME"`
-	UserEmail       string `envconfig:"USER_EMAIL"`
+	GithubToken     string `split_words:"true"`
+	ReleaseFilePath string `split_words:"true"`
+	Owner           string `split_words:"true"`
+	RepoFullName    string `split_words:"true"`
+	Repo            string `split_words:"true"`
+	BaseBranch      string `split_words:"true"`
+	NewTag          string `split_words:"true"`
+	UserName        string `split_words:"true"`
+	UserEmail       string `split_words:"true"`
 }
 
 func main() {

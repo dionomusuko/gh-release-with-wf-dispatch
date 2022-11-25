@@ -37,7 +37,7 @@ func newGitClient(ctx context.Context, token, repository string, config gitConfi
 		URL: fmt.Sprintf("https://%s@github.com/%s.git", token, repository),
 	})
 	if err != nil {
-		log.Fatalf("falied to clone repository")
+		log.Fatalf("falied to clone repository: %s", err.Error())
 	}
 	w, err := repo.Worktree()
 	if err != nil {

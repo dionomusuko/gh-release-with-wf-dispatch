@@ -24,6 +24,7 @@ inputs:
   repo_full_name:
     description: 'repository full name'
     required: true
+    default: ${{ github.repository }}
   base_branch:
     description: 'base branch'
     required: true
@@ -39,3 +40,6 @@ inputs:
     description: 'git config user.email'
     required: false
     default: '41898282+github-actions[bot]@users.noreply.github.com'
+  next_semver_level:
+    description: 'semver level to bump'
+    required: true

@@ -14,9 +14,9 @@ type env struct {
 	RepoFullName    string `split_words:"true"`
 	Repo            string `split_words:"true"`
 	BaseBranch      string `split_words:"true"`
-	NewTag          string `split_words:"true"`
 	UserName        string `split_words:"true"`
 	UserEmail       string `split_words:"true"`
+	NextSemverLevel string `split_words:"true"`
 }
 
 func main() {
@@ -28,9 +28,13 @@ func main() {
 
 	user := gitConfig{userName: e.UserName, userEmail: e.UserEmail}
 	gitCli := newGitClient(ctx, e.GithubToken, e.RepoFullName, user)
-	oldTag, newNode, yamlPath, parseFile := readReleaseFile(gitCli.file, e.ReleaseFilePath)
-	newNode, newTag := generateTag(newNode, oldTag, e.NewTag)
-	log.Printf("tag: %v", newTag)
+	currentTag, newNode, yamlPath, parseFile := readReleaseFile(gitCli.file, e.ReleaseFilePath)
+	nextTag, err := newSemver(currentTag, e.NextSemverLevel)
+	if err != nil {
+		log.Printf("currentTag: %s\n", currentTag)
+		log.Fatalf("failed to parse semver: %s", err.Error())
+	}
+	newNode, newTag := generateTag(newNode, currentTag, nextTag)
 	branch := gitCli.Checkout(newTag)
 	writeFile(yamlPath, gitCli.file, parseFile, newNode, e.ReleaseFilePath)
 	gitCli.Commit(e.ReleaseFilePath, newTag)

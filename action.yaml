@@ -34,3 +34,7 @@ inputs:
   next_semver_level:
     description: 'semver level to bump'
     required: true
+  assignees:
+    description: 'comma separated assignees for pull-request'
+    required: false
+    default: ${{ github.actor }}

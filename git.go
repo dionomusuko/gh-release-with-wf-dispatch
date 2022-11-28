@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -54,15 +53,15 @@ func newGitClient(ctx context.Context, token, repository string, config gitConfi
 }
 
 // Checkout new branch
-func (g *gitClient) Checkout(nextTag string) string {
-	branch := plumbing.ReferenceName("refs/heads/release-" + nextTag)
+func (g *gitClient) Checkout(refName string) (string, error) {
+	branch := plumbing.ReferenceName(refName)
 	if err := g.worktree.Checkout(&git.CheckoutOptions{
 		Create: true,
 		Branch: branch,
 	}); err != nil {
-		log.Fatalf("falied to chckout repository: %v", err)
+		return "", nil
 	}
-	return branch.String()
+	return branch.String(), nil
 }
 
 func (g *gitClient) Add(filePath string) error {

@@ -1,13 +1,13 @@
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'RELEASE'
   pull_request:
     types: [opened, synchronize]
     branches:
-      - master
+      - main
     paths:
       - 'RELEASE'
 

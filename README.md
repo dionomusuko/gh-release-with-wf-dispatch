@@ -57,7 +57,7 @@ jobs:
           github_token: ${{ secrets.GH_PAT }}
           release_file_path: ${{ github.event.inputs.release_file_path }}
           next_semver_level: ${{ github.event.inputs.next_semver_level }}
-          base_branch: "master"
+          base_branch: "develop"
           user_name: "username"
           user_email: "username@example.com"
 ```

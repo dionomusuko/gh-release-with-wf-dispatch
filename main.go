@@ -16,6 +16,7 @@ type env struct {
 	UserName        string `split_words:"true"`
 	UserEmail       string `split_words:"true"`
 	NextSemverLevel string `split_words:"true"`
+	Assignees       string `split_words:"true"`
 }
 
 const (
@@ -49,7 +50,11 @@ func main() {
 		panic(err)
 	}
 	newNode.Value = nextTag
-	branch := gitCli.Checkout(nextTag)
+	branchName, err := gitCli.Checkout("refs/heads/release-" + nextTag)
+	if err != nil {
+		fmt.Printf("failed to checkout %s\n", branchName)
+		panic(err)
+	}
 	if err := writeFile(yamlPath, gitCli.file, parseFile, newNode, e.ReleaseFilePath); err != nil {
 		fmt.Println("failed to write file")
 		panic(err)
@@ -67,12 +72,18 @@ func main() {
 	}
 
 	// GitHub operation
-	ghCli := newGHClient(ctx, e.GithubToken)
-	url, err := ghCli.createPullRequest(ctx, nextTag, e.BaseBranch, repositoryName, ownerName, branch)
+	ghCli := newGHClient(ctx, e.GithubToken, ownerName, repositoryName)
+	pr, err := ghCli.createPullRequest(ctx, nextTag, e.BaseBranch, branchName)
 	if err != nil {
+		fmt.Println("failed to create pull request")
 		panic(err)
 	}
-	fmt.Println(url)
+	fmt.Println(pr.GetHTMLURL())
+	// TODO: convert e.Assignees to []string
+	if err := ghCli.addAssignees(ctx, *pr.Number, []string{e.Assignees}); err != nil {
+		fmt.Println("failed to add assignees")
+		panic(err)
+	}
 }
 
 func splitRepoFullName(fullName string) (string, string) {

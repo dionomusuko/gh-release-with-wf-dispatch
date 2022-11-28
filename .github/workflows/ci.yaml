@@ -31,7 +31,7 @@ jobs:
       - run: go mod download
       - run: go mod tidy
       - run: git diff --exit-code # This fails if you forget to apply tidy
-      - run: test -z $(gofmt -l .) # This fails if you forget to apply gofmt
+      - run: test -z "$(gofmt -l .)" # This fails if you forget to apply gofmt
       - run: CGO_ENABLED=0 GOOS=linux go build
       - run: go test -v ./...
 

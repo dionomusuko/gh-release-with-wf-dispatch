@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"strings"
 
 	"github.com/kelseyhightower/envconfig"
 )
@@ -10,14 +11,16 @@ import (
 type env struct {
 	GithubToken     string `split_words:"true"`
 	ReleaseFilePath string `split_words:"true"`
-	Owner           string `split_words:"true"`
 	RepoFullName    string `split_words:"true"`
-	Repo            string `split_words:"true"`
 	BaseBranch      string `split_words:"true"`
 	UserName        string `split_words:"true"`
 	UserEmail       string `split_words:"true"`
 	NextSemverLevel string `split_words:"true"`
 }
+
+const (
+	repoFullNameDelimiter = "/"
+)
 
 func main() {
 	ctx := context.Background()
@@ -25,6 +28,9 @@ func main() {
 	if err := envconfig.Process("INPUT", &e); err != nil {
 		log.Fatal(err.Error())
 	}
+
+	separatedRepoFullName := strings.Split(e.RepoFullName, repoFullNameDelimiter)
+	ownerName, repositoryName := separatedRepoFullName[0], separatedRepoFullName[1]
 
 	user := gitConfig{userName: e.UserName, userEmail: e.UserEmail}
 	gitCli := newGitClient(ctx, e.GithubToken, e.RepoFullName, user)
@@ -38,7 +44,7 @@ func main() {
 	branch := gitCli.Checkout(newTag)
 	writeFile(yamlPath, gitCli.file, parseFile, newNode, e.ReleaseFilePath)
 	gitCli.Commit(e.ReleaseFilePath, newTag)
-	gitCli.Push(ctx, e.Owner)
+	gitCli.Push(ctx, ownerName)
 	ghCli := newGHClient(e.GithubToken)
-	ghCli.newPullRequest(ctx, newTag, e.BaseBranch, e.Repo, e.Owner, branch)
+	ghCli.newPullRequest(ctx, newTag, e.BaseBranch, repositoryName, ownerName, branch)
 }

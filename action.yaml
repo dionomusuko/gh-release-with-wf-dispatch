@@ -9,17 +9,11 @@ runs:
   image: 'Dockerfile'
 inputs:
   github_token:
-    description: 'github token'
-    required: false
+    description: 'GitHub personal access token'
+    required: true
     default: ${{ github.token }}
   release_file_path:
     description: 'release file path'
-    required: true
-  owner:
-    description: 'owner'
-    required: true
-  repo:
-    description: 'repository'
     required: true
   repo_full_name:
     description: 'repository full name'
@@ -29,9 +23,6 @@ inputs:
     description: 'base branch'
     required: true
     default: 'master'
-  new_tag:
-    description: 'new release tag, if you are doing patch-version-release, there is no need to configure'
-    required: false
   user_name:
     description: 'git config user.name'
     required: false

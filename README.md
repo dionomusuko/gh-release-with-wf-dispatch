@@ -6,40 +6,58 @@ Using this function with workflow dispatch, the RELEASE file can be rewritten.
 
 
 ## Usage
-1. Setting workflow dispatch
-e.g.
+
+### Creating a personal access token
+
+Creating your personal access token and save as a repository secret. (e.g. GH_PAT)
+
+Personal access tokens (classic): https://github.com/settings/tokens
+
+> **Note**
+>
+> Fine-grained personal access tokens are not supported currently.
+
+### Workflow
+
 ```yaml
+name: Release
+
 on:
   workflow_dispatch:
     inputs:
-      releaseFilePath:
-        description: 'Define the path of RELEASE file'
-        required: 'true'
-        default: 'RELEASE'
+      release_file_path:
+        description: "path to RELEASE file"
+        required: true
         type: choice
-        options: # Set RELEASE file path
-          - RELEASE
-          - testdata/RELEASE
-      newTag:
-        description: 'new tag'
-        required: 'false' # If you want to do PATCH version release, no input is required
-      baseBranch:
-        description: 'base branch e.g. master'
-        require: 'true'
-        default: 'master'
-```
+        options:
+          - app1/RELEASE
+          - app2/RELEASE
+      next_semver_level:
+        description: "semver level to bump"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
 
-2. Write your workflow file
-```yaml
-- name: release
-  uses: dionomusko/gh-release-with-wf-dispatch@master
-  with:
-    "github_token": ${{ secrets.GH_PAT }} # Set your GitHub personal access token (see: https://docs.github.com/ja/enterprise-cloud@latest/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
-    "owner": ${{ github.event.repository.owner.login }}
-    "repo": ${{ github.event.repository.name }}
-    "release_file_path": ${{ github.event.inputs.releaseFilePath }}
-    "base_branch": ${{ github.event.inputs.baseBranch }}
-    "new_tag": ${{ github.event.inputs.newTag }}
-    "user_name": "username"
-    "user_email": "useremail@example.com"
+jobs:
+  main:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: release
+        uses: peaceiris/gh-release-with-wf-dispatch@feat-semver-input
+        with:
+          github_token: ${{ secrets.GH_PAT }}
+          release_file_path: ${{ github.event.inputs.release_file_path }}
+          next_semver_level: ${{ github.event.inputs.next_semver_level }}
+          base_branch: "master"
+          user_name: "username"
+          user_email: "username@example.com"
 ```

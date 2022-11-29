@@ -29,7 +29,7 @@ func main() {
 	var e env
 	if err := envconfig.Process(inputPrefix, &e); err != nil {
 		fmt.Printf("failed to load inputs: %s\n", err.Error())
-		panic(err)
+		panic(err.Error())
 	}
 
 	ownerName, repositoryName := splitRepoFullName(e.RepoFullName)
@@ -37,38 +37,38 @@ func main() {
 	gitCli, err := newGitClient(ctx, e.GithubToken, e.RepoFullName, gitConf)
 	if err != nil {
 		fmt.Printf("failed to create git client: %s\n", err.Error())
-		panic(err)
+		panic(err.Error())
 	}
 	currentTag, newNode, yamlPath, parseFile, err := readReleaseFile(gitCli.file, e.ReleaseFilePath)
 	if err != nil {
 		fmt.Printf("failed to read release file: %s\n", err.Error())
-		panic(err)
+		panic(err.Error())
 	}
 	nextTag, err := newSemver(currentTag, e.NextSemverLevel)
 	if err != nil {
 		fmt.Printf("failed to parse semver for %s: %s", currentTag, err.Error())
-		panic(err)
+		panic(err.Error())
 	}
 	newNode.Value = nextTag
 	branchName, err := gitCli.Checkout("refs/heads/release-" + nextTag)
 	if err != nil {
 		fmt.Printf("failed to checkout %s\n", branchName)
-		panic(err)
+		panic(err.Error())
 	}
 	if err := writeFile(yamlPath, gitCli.file, parseFile, newNode, e.ReleaseFilePath); err != nil {
 		fmt.Println("failed to write file")
-		panic(err)
+		panic(err.Error())
 	}
 
 	// Git operation
 	if err := gitCli.Add(e.ReleaseFilePath); err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 	if err := gitCli.Commit("chore: release " + nextTag); err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 	if err := gitCli.Push(ctx); err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 
 	// GitHub operation
@@ -76,13 +76,13 @@ func main() {
 	pr, err := ghCli.createPullRequest(ctx, nextTag, e.BaseBranch, branchName)
 	if err != nil {
 		fmt.Println("failed to create pull request")
-		panic(err)
+		panic(err.Error())
 	}
 	fmt.Println(pr.GetHTMLURL())
 	// TODO: convert e.Assignees to []string
 	if err := ghCli.addAssignees(ctx, *pr.Number, []string{e.Assignees}); err != nil {
 		fmt.Println("failed to add assignees")
-		panic(err)
+		panic(err.Error())
 	}
 }
 

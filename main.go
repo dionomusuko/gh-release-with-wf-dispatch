@@ -9,14 +9,14 @@ import (
 )
 
 type env struct {
-	GithubToken     string `split_words:"true"`
-	ReleaseFilePath string `split_words:"true"`
-	RepoFullName    string `split_words:"true"`
-	BaseBranch      string `split_words:"true"`
-	UserName        string `split_words:"true"`
-	UserEmail       string `split_words:"true"`
-	NextSemverLevel string `split_words:"true"`
-	Assignees       string `split_words:"true"`
+	GithubToken     string   `split_words:"true"`
+	ReleaseFilePath string   `split_words:"true"`
+	RepoFullName    string   `split_words:"true"`
+	BaseBranch      string   `split_words:"true"`
+	UserName        string   `split_words:"true"`
+	UserEmail       string   `split_words:"true"`
+	NextSemverLevel string   `split_words:"true"`
+	Assignees       []string `split_words:"true"`
 }
 
 const (
@@ -79,8 +79,7 @@ func main() {
 		panic(err.Error())
 	}
 	fmt.Println(pr.GetHTMLURL())
-	// TODO: convert e.Assignees to []string
-	if err := ghCli.addAssignees(ctx, *pr.Number, []string{e.Assignees}); err != nil {
+	if err := ghCli.addAssignees(ctx, *pr.Number, e.Assignees); err != nil {
 		fmt.Println("failed to add assignees")
 		panic(err.Error())
 	}

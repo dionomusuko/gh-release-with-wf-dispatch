@@ -46,7 +46,7 @@ func main() {
 	}
 	nextTag, err := newSemver(currentTag, e.NextSemverLevel)
 	if err != nil {
-		fmt.Printf("failed to parse semver for %s: %s", currentTag, err.Error())
+		fmt.Printf("failed to parse semver for %s: %s\n", currentTag, err.Error())
 		panic(err.Error())
 	}
 	newNode.Value = nextTag

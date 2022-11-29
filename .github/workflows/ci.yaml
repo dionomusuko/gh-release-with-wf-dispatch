@@ -8,6 +8,9 @@ on:
       - ".github/workflows/ci.yaml"
       - "go.*"
       - "*.go"
+      - "Makefile"
+      - "Dockerfile"
+      - ".dockerignore"
   pull_request:
     branches:
       - main
@@ -15,6 +18,9 @@ on:
       - ".github/workflows/ci.yaml"
       - "go.*"
       - "*.go"
+      - "Makefile"
+      - "Dockerfile"
+      - ".dockerignore"
 
 jobs:
   go:
@@ -32,8 +38,8 @@ jobs:
       - run: go mod tidy
       - run: git diff --exit-code # This fails if you forget to apply tidy
       - run: test -z "$(gofmt -l .)" # This fails if you forget to apply gofmt
-      - run: CGO_ENABLED=0 GOOS=linux go build
-      - run: go test -v ./...
+      - run: make build
+      - run: make test
 
   docker:
     runs-on: ubuntu-22.04
@@ -42,5 +48,4 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # https://github.com/actions/checkout/releases/tag/v3.1.0
-      - name: Build
-        run: docker build .
+      - run: make docker-build

@@ -26,7 +26,7 @@ func newGHClient(token string) *ghClient {
 
 func (g *ghClient) newPullRequest(ctx context.Context, newTag, baseBranch, repo, owner, branchName string) {
 	pr := &github.NewPullRequest{
-		Title: github.String("chore: release-" + newTag),
+		Title: github.String("chore: release " + newTag),
 		Head:  github.String(owner + ":" + branchName),
 		Base:  github.String(baseBranch),
 		Body:  github.String("Release " + newTag),

@@ -3,6 +3,7 @@ module github.com/dionomusuko/gh-release-with-wf-dispatch
 go 1.19
 
 require (
+	github.com/aquasecurity/go-version v0.0.0-20210121072130-637058cfe492
 	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/goccy/go-yaml v1.9.6

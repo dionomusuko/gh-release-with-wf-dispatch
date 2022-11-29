@@ -30,12 +30,12 @@ func readReleaseFile(fs billy.Filesystem, filePath string) (string, *ast.StringN
 		log.Fatalf("failed to read file: %v", err)
 	}
 
-	yamlPath, err := yaml.PathString("$.tag")
+	tagNode, err := yaml.PathString("$.tag")
 	if err != nil {
 		log.Fatalf("failed to file path: %v", err)
 	}
 
-	oldNode, err := yamlPath.FilterFile(parseFile)
+	oldNode, err := tagNode.FilterFile(parseFile)
 	if err != nil {
 		log.Fatalf("failed to read old node")
 	}
@@ -50,16 +50,20 @@ func readReleaseFile(fs billy.Filesystem, filePath string) (string, *ast.StringN
 		}
 	}
 
-	return oldNode.String(), newNode, yamlPath, parseFile
+	return oldNode.String(), newNode, tagNode, parseFile
 }
 
 func writeFile(yamlPath *yaml.Path, fs billy.Filesystem, parseFile *ast.File, newNode *ast.StringNode, filePath string) {
 	if err := yamlPath.ReplaceWithNode(parseFile, newNode); err != nil {
 		log.Fatalf("failed to replace file: %v", err)
 	}
-	b, _ := io.ReadAll(parseFile)
-	f, _ := fs.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-	if _, err := f.Write(b); err != nil {
+	fileBytes, _ := io.ReadAll(parseFile)
+	fileBytesWithNewLine := append(fileBytes, "\n"...)
+	f, err := fs.OpenFile(filePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	if err != nil {
+		log.Fatalf("failed to open file %s", err.Error())
+	}
+	if _, err := f.Write(fileBytesWithNewLine); err != nil {
 		log.Fatalf("failed to write file: %v", err)
 	}
 }

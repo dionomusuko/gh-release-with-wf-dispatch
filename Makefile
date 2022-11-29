@@ -1,4 +1,4 @@
-DOCKER_IMAGE_NAME := ghcr.io/dionomusuko/release-helper
+DOCKER_IMAGE_NAME := ghcr.io/dionomusuko/gh-release-with-wf-dispatch
 DOCKER_SCOPE := docker-latest
 
 .PHONY: test

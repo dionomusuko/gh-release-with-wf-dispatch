@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewSemver(t *testing.T) {
+func Test_newSemver(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -73,11 +73,11 @@ func TestNewSemver(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			newSemver, err := newSemver(tt.tag, tt.incrLevel)
+			nextTag, err := newSemver(tt.tag, tt.incrLevel)
 			if tt.wantErr != "" {
 				assert.EqualError(t, err, tt.wantErr)
 			}
-			assert.Equal(t, tt.want, newSemver)
+			assert.Equal(t, tt.want, nextTag)
 		})
 	}
 }

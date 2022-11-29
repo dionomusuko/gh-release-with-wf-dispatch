@@ -2,49 +2,90 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"strings"
 
 	"github.com/kelseyhightower/envconfig"
 )
 
 type env struct {
-	GithubToken     string `split_words:"true"`
-	ReleaseFilePath string `split_words:"true"`
-	RepoFullName    string `split_words:"true"`
-	BaseBranch      string `split_words:"true"`
-	UserName        string `split_words:"true"`
-	UserEmail       string `split_words:"true"`
-	NextSemverLevel string `split_words:"true"`
+	GithubToken     string   `split_words:"true"`
+	ReleaseFilePath string   `split_words:"true"`
+	RepoFullName    string   `split_words:"true"`
+	BaseBranch      string   `split_words:"true"`
+	UserName        string   `split_words:"true"`
+	UserEmail       string   `split_words:"true"`
+	NextSemverLevel string   `split_words:"true"`
+	Assignees       []string `split_words:"true"`
 }
 
 const (
 	repoFullNameDelimiter = "/"
+	inputPrefix           = "INPUT"
 )
 
 func main() {
 	ctx := context.Background()
 	var e env
-	if err := envconfig.Process("INPUT", &e); err != nil {
-		log.Fatal(err.Error())
+	if err := envconfig.Process(inputPrefix, &e); err != nil {
+		fmt.Printf("failed to load inputs: %s\n", err.Error())
+		panic(err.Error())
 	}
 
-	separatedRepoFullName := strings.Split(e.RepoFullName, repoFullNameDelimiter)
-	ownerName, repositoryName := separatedRepoFullName[0], separatedRepoFullName[1]
-
-	user := gitConfig{userName: e.UserName, userEmail: e.UserEmail}
-	gitCli := newGitClient(ctx, e.GithubToken, e.RepoFullName, user)
-	currentTag, newNode, yamlPath, parseFile := readReleaseFile(gitCli.file, e.ReleaseFilePath)
+	ownerName, repositoryName := splitRepoFullName(e.RepoFullName)
+	gitConf := gitConfig{userName: e.UserName, userEmail: e.UserEmail}
+	gitCli, err := newGitClient(ctx, e.GithubToken, e.RepoFullName, gitConf)
+	if err != nil {
+		fmt.Printf("failed to create git client: %s\n", err.Error())
+		panic(err.Error())
+	}
+	currentTag, newNode, yamlPath, parseFile, err := readReleaseFile(gitCli.file, e.ReleaseFilePath)
+	if err != nil {
+		fmt.Printf("failed to read release file: %s\n", err.Error())
+		panic(err.Error())
+	}
 	nextTag, err := newSemver(currentTag, e.NextSemverLevel)
 	if err != nil {
-		log.Printf("currentTag: %s\n", currentTag)
-		log.Fatalf("failed to parse semver: %s", err.Error())
+		fmt.Printf("failed to parse semver for %s: %s\n", currentTag, err.Error())
+		panic(err.Error())
 	}
-	newNode, newTag := generateTag(newNode, currentTag, nextTag)
-	branch := gitCli.Checkout(newTag)
-	writeFile(yamlPath, gitCli.file, parseFile, newNode, e.ReleaseFilePath)
-	gitCli.Commit(e.ReleaseFilePath, newTag)
-	gitCli.Push(ctx, ownerName)
-	ghCli := newGHClient(e.GithubToken)
-	ghCli.newPullRequest(ctx, newTag, e.BaseBranch, repositoryName, ownerName, branch)
+	newNode.Value = nextTag
+	branchName, err := gitCli.Checkout("refs/heads/release-" + nextTag)
+	if err != nil {
+		fmt.Printf("failed to checkout %s\n", branchName)
+		panic(err.Error())
+	}
+	if err := writeFile(yamlPath, gitCli.file, parseFile, newNode, e.ReleaseFilePath); err != nil {
+		fmt.Println("failed to write file")
+		panic(err.Error())
+	}
+
+	// Git operation
+	if err := gitCli.Add(e.ReleaseFilePath); err != nil {
+		panic(err.Error())
+	}
+	if err := gitCli.Commit("chore: release " + nextTag); err != nil {
+		panic(err.Error())
+	}
+	if err := gitCli.Push(ctx); err != nil {
+		panic(err.Error())
+	}
+
+	// GitHub operation
+	ghCli := newGHClient(ctx, e.GithubToken, ownerName, repositoryName)
+	pr, err := ghCli.createPullRequest(ctx, nextTag, e.BaseBranch, branchName)
+	if err != nil {
+		fmt.Println("failed to create pull request")
+		panic(err.Error())
+	}
+	fmt.Println(pr.GetHTMLURL())
+	if err := ghCli.addAssignees(ctx, *pr.Number, e.Assignees); err != nil {
+		fmt.Println("failed to add assignees")
+		panic(err.Error())
+	}
+}
+
+func splitRepoFullName(fullName string) (string, string) {
+	separatedRepoFullName := strings.Split(fullName, repoFullNameDelimiter)
+	return separatedRepoFullName[0], separatedRepoFullName[1]
 }

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -12,7 +11,6 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
 )
 
@@ -29,7 +27,7 @@ type gitConfig struct {
 	userEmail string
 }
 
-func newGitClient(ctx context.Context, token, repository string, config gitConfig) *gitClient {
+func newGitClient(ctx context.Context, token, repository string, config gitConfig) (*gitClient, error) {
 	fs := memfs.New()
 
 	// https://<GITHUB_TOKEN>@github.com/<REPO>.git
@@ -37,11 +35,13 @@ func newGitClient(ctx context.Context, token, repository string, config gitConfi
 		URL: fmt.Sprintf("https://%s@github.com/%s.git", token, repository),
 	})
 	if err != nil {
-		log.Fatalf("falied to clone repository: %s", err.Error())
+		fmt.Printf("failed to clone repository %s\n", repository)
+		return nil, err
 	}
 	w, err := repo.Worktree()
 	if err != nil {
-		log.Fatalf("falied to get worktree: %v", err)
+		fmt.Println("failed to get worktree")
+		return nil, err
 	}
 	return &gitClient{
 		repository: repo,
@@ -49,47 +49,58 @@ func newGitClient(ctx context.Context, token, repository string, config gitConfi
 		file:       fs,
 		token:      token,
 		config:     config,
-	}
+	}, nil
 }
 
 // Checkout new branch
-func (g *gitClient) Checkout(newTag string) string {
-	branch := plumbing.ReferenceName("refs/heads/release-" + newTag)
+func (g *gitClient) Checkout(refName string) (string, error) {
+	branch := plumbing.ReferenceName(refName)
 	if err := g.worktree.Checkout(&git.CheckoutOptions{
 		Create: true,
 		Branch: branch,
 	}); err != nil {
-		log.Fatalf("falied to chckout repository: %v", err)
+		return "", nil
 	}
-	return branch.String()
+	return branch.String(), nil
 }
 
-func (g *gitClient) Commit(filePath, newTag string) {
-	// Create Commit
+func (g *gitClient) Add(filePath string) error {
 	if _, err := g.worktree.Add(filePath); err != nil {
-		log.Fatalf("falied to add")
+		fmt.Printf("failed to git add file %s\n", filePath)
+		return err
 	}
-	_, err := g.worktree.Commit("chore: release-"+newTag, &git.CommitOptions{
-		Author: &object.Signature{
-			Name:  g.config.userName,
-			Email: g.config.userEmail,
-			When:  time.Now(),
-		}})
-	if err != nil {
-		log.Fatalf("falied to commit")
-	}
+	return nil
 }
 
-func (g *gitClient) Push(ctx context.Context, owner string) {
-	if err := g.repository.PushContext(ctx, &git.PushOptions{
-		Progress: os.Stdout,
-		Auth: &http.BasicAuth{
-			Username: owner,
-			Password: g.token,
+func (g *gitClient) Commit(msg string) error {
+	commitHash, err := g.worktree.Commit(
+		msg,
+		&git.CommitOptions{
+			Author: &object.Signature{
+				Name:  g.config.userName,
+				Email: g.config.userEmail,
+				When:  time.Now(),
+			},
 		},
-		RemoteName: "origin",
-	}); err != nil {
-		log.Fatalf("failed to push: %v", err)
+	)
+	if err != nil {
+		fmt.Println("failed to git commit")
+		return err
 	}
+	fmt.Printf("commit %s has been created\n", commitHash.String())
+	return nil
+}
 
+func (g *gitClient) Push(ctx context.Context) error {
+	if err := g.repository.PushContext(
+		ctx,
+		&git.PushOptions{
+			Progress:   os.Stdout,
+			RemoteName: "origin",
+		},
+	); err != nil {
+		fmt.Println("failed to git push")
+		return err
+	}
+	return nil
 }

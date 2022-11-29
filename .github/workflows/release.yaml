@@ -1,30 +1,34 @@
+name: Release
+
 on:
   workflow_dispatch:
     inputs:
-      releaseFilePath:
-        description: 'Define the path of RELEASE file'
+      release_file_path:
+        description: "path to RELEASE file"
         required: true
-        default: 'RELEASE'
         type: choice
         options:
-          - 'RELEASE'
-          - 'testdata/RELEASE'
-      newTag:
-        description: 'new tag'
-        required: false
+          - RELEASE
+          - testdata/RELEASE
+      next_semver_level:
+        description: "semver level to bump"
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          #- major
 
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  main:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    timeout-minutes: 5
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - uses: dionomusuko/gh-release-with-wf-dispatch@master
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # https://github.com/actions/checkout/releases/tag/v3.1.0
+      - uses: dionomusuko/gh-release-with-wf-dispatch@main
         with:
-          "github_token": ${{ secrets.GH_PAT }}
-          "owner": ${{ github.event.repository.owner.login }}
-          "repo_full_name": ${{ github.event.repository.full_name }}
-          "repo": ${{ github.event.repository.name }}
-          "release_file_path": ${{ github.event.inputs.releaseFilePath }}
-          "base_branch": ${{ github.event.repository.default_branch }}
-          "new_tag": ${{ github.event.inputs.newTag }}
+          github_token: ${{ secrets.GH_PAT }}
+          release_file_path: ${{ github.event.inputs.release_file_path }}
+          next_semver_level: ${{ github.event.inputs.next_semver_level }}

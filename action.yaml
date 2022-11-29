@@ -22,7 +22,7 @@ inputs:
   base_branch:
     description: 'base branch'
     required: true
-    default: 'master'
+    default: 'main'
   user_name:
     description: 'git config user.name'
     required: false
@@ -34,3 +34,7 @@ inputs:
   next_semver_level:
     description: 'semver level to bump'
     required: true
+  assignees:
+    description: 'comma separated assignees for pull-request'
+    required: false
+    default: ${{ github.actor }}

@@ -42,6 +42,8 @@ jobs:
       - run: test -z "$(gofmt -l .)" # This fails if you forget to apply gofmt
       - run: make build
       - run: make test
+      - run: go install github.com/google/go-licenses@v1.5.0
+      - run: go-licenses check .
 
   docker:
     runs-on: ubuntu-22.04

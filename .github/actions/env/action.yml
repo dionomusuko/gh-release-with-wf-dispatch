@@ -14,6 +14,6 @@ runs:
       id: env
       shell: "bash"
       run: |
-        cat << EOF >> "${GITHUB_OUTPUT}"
+        cat << EOF >> "${GITHUB_ENV}"
         ACTIONS_CACHE_URL="${ACTIONS_CACHE_URL}"
         EOF

@@ -1,0 +1,19 @@
+name: "Export envs"
+description: "A composite action to export ACTIONS_ envs"
+outputs:
+  cache_url:
+    description: "ACTIONS_CACHE_URL"
+    value: ${{ steps.env.outputs.ACTIONS_CACHE_URL }}
+#   runtime_token:
+#     description: "ACTIONS_RUNTIME_TOKEN"
+#     value: ${{ steps.env.outputs.ACTIONS_RUNTIME_TOKEN }}
+runs:
+  using: "composite"
+  steps:
+    - name: "export outputs"
+      id: env
+      shell: "bash"
+      run: |
+        cat << EOF >> "${GITHUB_OUTPUT}"
+        ACTIONS_CACHE_URL="${ACTIONS_CACHE_URL}"
+        EOF

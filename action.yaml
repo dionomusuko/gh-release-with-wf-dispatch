@@ -6,7 +6,7 @@ branding:
   color: 'green'
 runs:
   using: 'docker'
-  image: 'Dockerfile'
+  image: 'docker://ghcr.io/dionomusuko/gh-release-with-wf-dispatch@sha256:28843375f8f4b1fcc84f082a2b48b5baa985bee09202a8f1f77c853fc70a0711'
 inputs:
   github_token:
     description: 'GitHub personal access token'

@@ -41,6 +41,12 @@ func Test_newSemver(t *testing.T) {
 			want:      "app1/microservice/v1.0.1",
 		},
 		{
+			name:      "success with another format",
+			tag:       "app2-hoge/microservice/v1.0.0",
+			incrLevel: "patch",
+			want:      "app2-hoge/microservice/v1.0.1",
+		},
+		{
 			name:      "success with YAML comment",
 			tag:       "app1/microservice/v1.0.0 # comment",
 			incrLevel: "patch",

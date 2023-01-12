@@ -42,9 +42,9 @@ func Test_newSemver(t *testing.T) {
 		},
 		{
 			name:      "success with another format",
-			tag:       "app2-hoge/microservice/v1.0.0",
+			tag:       "app2-hoge/app2-hoge-subscriber/v1.0.0",
 			incrLevel: "patch",
-			want:      "app2-hoge/microservice/v1.0.1",
+			want:      "app2-hoge/app2-hoge-subscriber/v1.0.1",
 		},
 		{
 			name:      "success with YAML comment",

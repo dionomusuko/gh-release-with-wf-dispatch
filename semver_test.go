@@ -47,6 +47,12 @@ func Test_newSemver(t *testing.T) {
 			want:      "app1/microservice/v1.0.1",
 		},
 		{
+			name:      "success with npm format",
+			tag:       "app@1.0.0",
+			incrLevel: "patch",
+			want:      "app@1.0.1",
+		},
+		{
 			name:      "failed to parse semver",
 			tag:       "va.b.c",
 			incrLevel: "patch",

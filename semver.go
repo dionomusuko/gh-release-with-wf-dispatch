@@ -8,15 +8,26 @@ import (
 )
 
 const (
-	commentDelimiter = "#"
-	tagDelimiter     = "/"
-	versionPrefix    = "v"
+	commentDelimiter   = "#"
+	tagSlashDelimiter  = "/"
+	tagAtmarkDelimiter = "@"
+	versionPrefix      = "v"
 )
 
 func newSemver(currentTag string, incrLevel string) (string, error) {
 	separatedTagWithComment := strings.Split(currentTag, commentDelimiter)
 	tagWithoutComment := strings.TrimSpace(separatedTagWithComment[0])
-	separatedTag := strings.Split(tagWithoutComment, tagDelimiter)
+	separatedTag := strings.Split(tagWithoutComment, tagSlashDelimiter)
+
+	var isTagAtmarkDelimiter bool
+	isTagAtmarkDelimiter = false
+	if len(separatedTag) == 1 {
+		separatedTag = strings.Split(tagWithoutComment, tagAtmarkDelimiter)
+		if len(separatedTag) > 1 {
+			isTagAtmarkDelimiter = true
+		}
+	}
+
 	currentSemver := separatedTag[len(separatedTag)-1]
 	sv, err := semver.Parse(strings.TrimPrefix(currentSemver, versionPrefix))
 	if err != nil {
@@ -35,6 +46,12 @@ func newSemver(currentTag string, incrLevel string) (string, error) {
 	default:
 		return "", fmt.Errorf("%s not supported", incrLevel)
 	}
+
+	if isTagAtmarkDelimiter {
+		separatedTag[len(separatedTag)-1] = fmt.Sprintf("%s", nextSemver)
+		return strings.Join(separatedTag, tagAtmarkDelimiter), nil
+	}
+
 	separatedTag[len(separatedTag)-1] = fmt.Sprintf("v%s", nextSemver)
-	return strings.Join(separatedTag, tagDelimiter), nil
+	return strings.Join(separatedTag, tagSlashDelimiter), nil
 }

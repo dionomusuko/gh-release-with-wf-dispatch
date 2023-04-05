@@ -50,7 +50,8 @@ func main() {
 		panic(err.Error())
 	}
 	newNode.Value = nextTag
-	branchName, err := gitCli.Checkout("refs/heads/release-" + nextTag)
+	branchName := "release-" + nextTag
+	refName, err := gitCli.Checkout("refs/heads/" + branchName)
 	if err != nil {
 		fmt.Printf("failed to checkout %s\n", branchName)
 		panic(err.Error())
@@ -73,11 +74,17 @@ func main() {
 
 	// GitHub operation
 	ghCli := newGHClient(ctx, e.GithubToken, ownerName, repositoryName)
-	pr, err := ghCli.createPullRequest(ctx, nextTag, e.BaseBranch, branchName)
+	pr, err := ghCli.createPullRequest(ctx, nextTag, e.BaseBranch, refName)
 	if err != nil {
 		fmt.Println("failed to create pull request")
 		panic(err.Error())
 	}
+
+	if err := setOutput("BRANCH_NAME", branchName); err != nil {
+		fmt.Println("failed to set BRANCH_NAME")
+		panic(err.Error())
+	}
+
 	fmt.Println(pr.GetHTMLURL())
 	if err := ghCli.addAssignees(ctx, *pr.Number, e.Assignees); err != nil {
 		fmt.Println("failed to add assignees")

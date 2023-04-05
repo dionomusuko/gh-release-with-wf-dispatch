@@ -6,7 +6,7 @@ branding:
   color: 'green'
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/dionomusuko/gh-release-with-wf-dispatch@sha256:22cf08bd4ecf48e7a4116e19754cd00aad6e86f991e8bd998ab5a3f1badd3e58'
+  image: 'Dockerfile' # 'docker://ghcr.io/dionomusuko/gh-release-with-wf-dispatch@sha256:22cf08bd4ecf48e7a4116e19754cd00aad6e86f991e8bd998ab5a3f1badd3e58'
 inputs:
   github_token:
     description: 'GitHub personal access token'
@@ -38,3 +38,6 @@ inputs:
     description: 'comma separated assignees for pull-request'
     required: false
     default: ${{ github.actor }}
+outputs:
+  BRANCH_NAME:
+    description: 'BRANCH_NAME env'

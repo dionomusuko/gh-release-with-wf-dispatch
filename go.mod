@@ -8,6 +8,7 @@ require (
 	github.com/go-git/go-git/v5 v5.6.1
 	github.com/goccy/go-yaml v1.11.0
 	github.com/google/go-github v17.0.0+incompatible
+	github.com/google/uuid v1.3.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/oauth2 v0.6.0
